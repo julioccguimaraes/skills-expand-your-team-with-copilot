@@ -1,4 +1,27 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // Dark mode toggle
+  const darkModeToggle = document.getElementById("dark-mode-toggle");
+  const darkModeIcon = document.getElementById("dark-mode-icon");
+
+  function applyDarkMode(isDark) {
+    if (isDark) {
+      document.body.classList.add("dark-mode");
+      darkModeIcon.textContent = "☀️";
+    } else {
+      document.body.classList.remove("dark-mode");
+      darkModeIcon.textContent = "🌙";
+    }
+  }
+
+  // Load saved preference
+  applyDarkMode(localStorage.getItem("darkMode") === "true");
+
+  darkModeToggle.addEventListener("click", () => {
+    const isDark = !document.body.classList.contains("dark-mode");
+    localStorage.setItem("darkMode", isDark);
+    applyDarkMode(isDark);
+  });
+
   // DOM elements
   const activitiesList = document.getElementById("activities-list");
   const messageDiv = document.getElementById("message");
@@ -27,11 +50,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Activity categories with corresponding colors
   const activityTypes = {
-    sports: { label: "Sports", color: "#e8f5e9", textColor: "#2e7d32" },
-    arts: { label: "Arts", color: "#f3e5f5", textColor: "#7b1fa2" },
-    academic: { label: "Academic", color: "#e3f2fd", textColor: "#1565c0" },
-    community: { label: "Community", color: "#fff3e0", textColor: "#e65100" },
-    technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
+    sports: { label: "Sports", cssClass: "tag-sports" },
+    arts: { label: "Arts", cssClass: "tag-arts" },
+    academic: { label: "Academic", cssClass: "tag-academic" },
+    community: { label: "Community", cssClass: "tag-community" },
+    technology: { label: "Technology", cssClass: "tag-technology" },
   };
 
   // State for activities and filters
@@ -501,7 +524,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Create activity tag
     const tagHtml = `
-      <span class="activity-tag" style="background-color: ${typeInfo.color}; color: ${typeInfo.textColor}">
+      <span class="activity-tag ${typeInfo.cssClass}">
         ${typeInfo.label}
       </span>
     `;
