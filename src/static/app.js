@@ -519,6 +519,10 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
+    // Build share URL with the activity name as a search parameter
+    const shareUrl = `${window.location.origin}${window.location.pathname}?search=${encodeURIComponent(name)}`;
+    const shareText = `Check out "${name}" at Mergington High School!`;
+
     activityCard.innerHTML = `
       ${tagHtml}
       <h4>${name}</h4>
@@ -552,6 +556,21 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("")}
         </ul>
       </div>
+      <div class="share-buttons">
+        <span class="share-label">Share:</span>
+        <a class="share-btn share-twitter tooltip" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}" target="_blank" rel="noopener" aria-label="Share on X (Twitter)">
+          𝕏
+          <span class="tooltip-text">Share on X (Twitter)</span>
+        </a>
+        <a class="share-btn share-whatsapp tooltip" href="https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}" target="_blank" rel="noopener" aria-label="Share on WhatsApp">
+          💬
+          <span class="tooltip-text">Share on WhatsApp</span>
+        </a>
+        <button class="share-btn share-copy tooltip" data-share-url="${shareUrl}" aria-label="Copy link">
+          🔗
+          <span class="tooltip-text">Copy link</span>
+        </button>
+      </div>
       <div class="activity-card-actions">
         ${
           currentUser
@@ -576,6 +595,20 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteButtons.forEach((button) => {
       button.addEventListener("click", handleUnregister);
     });
+
+    // Add click handler for copy link button
+    const copyButton = activityCard.querySelector(".share-copy");
+    if (copyButton) {
+      copyButton.addEventListener("click", () => {
+        const url = copyButton.dataset.shareUrl;
+        navigator.clipboard.writeText(url).then(() => {
+          const tooltip = copyButton.querySelector(".tooltip-text");
+          const original = tooltip.textContent;
+          tooltip.textContent = "Copied!";
+          setTimeout(() => { tooltip.textContent = original; }, 2000);
+        });
+      });
+    }
 
     // Add click handler for register button (only when authenticated)
     if (currentUser) {
@@ -864,5 +897,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize app
   checkAuthentication();
   initializeFilters();
+
+  // Pre-fill search from URL parameter (used by shared links)
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchParam = urlParams.get("search");
+  if (searchParam) {
+    searchInput.value = searchParam;
+    searchQuery = searchParam;
+  }
+
   fetchActivities();
 });
